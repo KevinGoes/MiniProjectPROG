@@ -1,5 +1,4 @@
 import csv
-from getpass import getpass
 
 
 def omzettenASCII(omzetWaarde):
@@ -37,6 +36,7 @@ def infoPubliek():
             aantalRegels += 1
             omgezet = terugomzettenASCII(regel['pq^ifkd'])
             stallingBezet.append(omgezet)
+        aantalRegels = 100 - aantalRegels
         return aantalRegels, stallingBezet
 
 
@@ -61,7 +61,7 @@ def infoPersoonlijk():
                     else:
                         print('Verkeerd wachtwoord voor stalling {}, probeer het nogmaals \n'.format(invoerStalling))
         else:
-            print('Stalling {} is niet in bezet, probeer het nogmaals \n'.format(invoerStalling))
+            print('Stalling {} is niet in gebruik, probeer het nogmaals \n'.format(invoerStalling))
 
 
 vrij, stalling = infoPubliek()
