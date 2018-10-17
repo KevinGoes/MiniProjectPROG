@@ -64,7 +64,13 @@ def infoPersoonlijk(invoerStalling, invoerWachtwoord):
 vrij, stalling = infoPubliek()
 print('Er zijn nog {} stallingen vrij, {} stallingen zijn bezet'.format(vrij, stalling))
 while True:
-    invoerStalling = input('Welke stalling heeft u? ')
+    while True:
+        try:
+            invoerStalling = int(input('Welke stalling heeft u? '))
+            invoerStalling = str(invoerStalling)
+            break
+        except ValueError:
+            print('Voer een geldig stallingsnummer in!')
     invoerWachtwoord = input('Welk wachtwoord heeft u voor stalling {}? '.format(invoerStalling))
     if infoPersoonlijk(invoerStalling, invoerWachtwoord) == 'fout wachtwoord':
         print('Fout wachtwoord, probeer nogmaals!')
