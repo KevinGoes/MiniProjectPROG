@@ -39,13 +39,11 @@ def infoPubliek():
         return aantalRegels, stallingBezet
 
 
-def infoPersoonlijk():
+def infoPersoonlijk(invoerStalling, invoerWachtwoord):
     aantalRegels, stallingBezet = infoPubliek()
     while True:
-        invoerStalling = input('Welke stalling heeft u? ')
         if invoerStalling in stallingBezet:
             while True:
-                invoerWachtwoord = input('Welk wachtwoord heeft u voor stalling {}? '.format(invoerStalling))
                 with open('stalling.csv', 'r', newline='') as myCSVFile:
                     aantalRegels = 0
                     wachtwoord = []
@@ -58,11 +56,21 @@ def infoPersoonlijk():
                     if wachtwoord[regel] == invoerWachtwoord:
                         return 'U heeft toegang tot uw stalling!'
                     else:
-                        print('Verkeerd wachtwoord voor stalling {}, probeer het nogmaals \n'.format(invoerStalling))
+                        return 'fout wachtwoord'
         else:
-            print('Stalling {} is niet in bezet, probeer het nogmaals \n'.format(invoerStalling))
+            return 'fout stalling'
 
 
 vrij, stalling = infoPubliek()
 print('Er zijn nog {} stallingen vrij, {} stallingen zijn bezet'.format(vrij, stalling))
-print(infoPersoonlijk())
+while True:
+    invoerStalling = input('Welke stalling heeft u? ')
+    invoerWachtwoord = input('Welk wachtwoord heeft u voor stalling {}? '.format(invoerStalling))
+    if infoPersoonlijk(invoerStalling, invoerWachtwoord) == 'fout wachtwoord':
+        print('Fout wachtwoord, probeer nogmaals!')
+    elif infoPersoonlijk(invoerStalling, invoerWachtwoord) == 'fout stalling':
+        print('Stalling niet in gebruik, probeer nogmaals!')
+    else:
+        print('U heeft toegang tot uw stalling!')
+        break
+
