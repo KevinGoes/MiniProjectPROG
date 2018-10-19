@@ -112,31 +112,38 @@ def gegevensTerugzetten():
             writer.writerow(i)
 
 
-print('1: Algemene informatie')
-print('2: Persoonlijke informatie')
-print('3: Fiets ophalen')
+print('1: Informatie')
+print('2: Fiets ophalen')
 invoerOptie = input('Optie: ')
 if invoerOptie == '1':
-    vrij, stalling = infoPubliek()
-    print('Er zijn nog {} stallingen vrij, {} stallingen zijn bezet'.format(vrij, stalling))
-elif invoerOptie == '2':
-    while True:
-        while True:
-            try:
-                invoerStalling = int(input('Welke stalling heeft u? '))
-                invoerStalling = str(invoerStalling)
-                break
-            except ValueError:
-                print('Voer een geldig stallingsnummer in!')
-        invoerWachtwoord = input('Welk wachtwoord heeft u voor stalling {}? '.format(invoerStalling))
-        if infoPersoonlijk(invoerStalling, invoerWachtwoord) == 'fout wachtwoord':
-            print('Fout wachtwoord, probeer nogmaals!')
-        elif infoPersoonlijk(invoerStalling, invoerWachtwoord) == 'fout stalling':
-            print('Stalling niet in gebruik, probeer nogmaals!')
+    print('\n1: Publieke informatie')
+    print('2: Persoonlijke informatie')
+    invoerOptie = input('Optie: ')
+    if invoerOptie == '1':
+        vrij, stalling = infoPubliek()
+        if vrij == 1:
+            print('Er is nog {} stalling vrij, stalling {} is bezet'.format(vrij, stalling))
         else:
-            print('U heeft toegang tot uw stalling!')
-            break
-elif invoerOptie == '3':
+            print('Er zijn nog {} stallingen vrij, stallingen {} zijn bezet'.format(vrij, stalling))
+    elif invoerOptie == '2':
+        while True:
+            while True:
+                try:
+                    invoerStalling = int(input('Welke stalling heeft u? '))
+                    invoerStalling = str(invoerStalling)
+                    break
+                except ValueError:
+                    print('Voer een geldig stallingsnummer in!')
+            invoerWachtwoord = input('Welk wachtwoord heeft u voor stalling {}? '.format(invoerStalling))
+            if infoPersoonlijk(invoerStalling, invoerWachtwoord) == 'fout wachtwoord':
+                print('Fout wachtwoord, probeer nogmaals!')
+            elif infoPersoonlijk(invoerStalling, invoerWachtwoord) == 'fout stalling':
+                print('Stalling niet in gebruik, probeer nogmaals!')
+            else:
+                print('U heeft toegang tot uw stalling!')
+                break
+
+elif invoerOptie == '2':
     stalling, wachtwoorden, datum, registratienummer = ophalenGegevens()
     while True:
         invoerRegistratienummer = input("Geef alstublieft uw registratienummer: ")
