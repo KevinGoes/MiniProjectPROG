@@ -242,6 +242,7 @@ def toonInformatiePubliek():
 
 def toonInformatiePersoonlijkOutput():
     InformatiePersoonlijkFrame.pack_forget()
+    InformatiePersoonlijkFoutFrame.pack_forget()
     if infoPersoonlijk(invoerStalling.get(), invoerWachtwoord.get()) == 'fout':
         InformatiePersoonlijkFoutFrame.pack()
     else:
@@ -272,17 +273,20 @@ RegistrerenFrame.pack(fill="both", expand=True)
 RegistrerenLabel = Label(master=RegistrerenFrame, text='Registreren', background='yellow', foreground='blue', width=50, height=5, font=('Helvetica', 15, 'bold'))
 RegistrerenLabel.pack(padx=20, pady=20)
 
+
 #Stallen
 StallenFrame = Frame(master=root, background='yellow')
 StallenFrame.pack(fill="both", expand=True)
 StallenLabel = Label(master=StallenFrame, text='Stallen', background='yellow', foreground='blue', width=50, height=5, font=('Helvetica', 15, 'bold'))
 StallenLabel.pack(padx=20, pady=20)
 
+
 #Ophalen
 OphalenFrame = Frame(master=root, background='yellow')
 OphalenFrame.pack(fill="both", expand=True)
 OphalenLabel = Label(master=OphalenFrame, text='Ophalen', background='yellow', foreground='blue', width=50, height=5, font=('Helvetica', 15, 'bold'))
 OphalenLabel.pack(padx=20, pady=20)
+
 
 #Informatie
 InformatieFrame = Frame(master=root, background='yellow')
@@ -293,6 +297,7 @@ PubliekeInformatieButton = Button(master=InformatieFrame, text='Publieke Informa
 PubliekeInformatieButton.pack(side=LEFT)
 PersoonlijkeInformatieButton = Button(master=InformatieFrame, text='Persoonlijke Informatie', height=7, width=30, font=('Helvetica', 15, 'bold'),background='royalblue',foreground='white', command=toonInformatiePersoonlijk)
 PersoonlijkeInformatieButton.pack(side=RIGHT)
+
 
 #Informatie Publiek
 InformatiePubliekFrame = Frame(master=root, background='yellow')
@@ -305,19 +310,23 @@ InformatiePubliekLabel1.pack()
 InformatiePersoonlijk = Frame(master=root, background='yellow')
 InformatiePersoonlijk.pack
 
+
 #Informatie Persoonlijk Output fout!
 InformatiePersoonlijkFoutFrame = Frame(master=root, background='yellow')
 InformatieFoutLabel = Label(master=InformatiePersoonlijkFoutFrame, text='Wachtwoord en/of Stalling is verkeerd ingevoerd!', background='yellow', foreground='red', width=50, height=5, font=('Helvetica', 15, 'bold'))
 InformatieFoutLabel.pack(padx=50, pady=50)
 invoerStallingLabel = Label(master=InformatiePersoonlijkFoutFrame, text='Voer hieronder uw Stalling nummer in:', background='yellow', foreground='blue', width=50, height=5, font=('Helvetica', 15, 'bold'))
 invoerStallingLabel.pack(padx=10, pady=0)
-invoerStalling = Entry(master=InformatiePersoonlijkFoutFrame, background='blue')
-invoerStalling.pack(padx=20, pady=20)
+invoerStallingFout = Entry(master=InformatiePersoonlijkFoutFrame, background='blue')
+invoerStallingFout.pack(padx=20, pady=20)
 invoerWachtwoordLabel = Label(master=InformatiePersoonlijkFoutFrame, text='Voer hieronder uw Wachtwoord van uw stalling in:', background='yellow', foreground='blue', width=50, height=5, font=('Helvetica', 15, 'bold'))
 invoerWachtwoordLabel.pack(padx=10, pady=0)
-invoerWachtwoord = Entry(master=InformatiePersoonlijkFoutFrame, background='blue')
-invoerWachtwoord.pack(padx=20, pady=20)
+invoerWachtwoordFout = Entry(master=InformatiePersoonlijkFoutFrame, background='blue')
+invoerWachtwoordFout.pack(padx=20, pady=20)
+InformatiePersoonlijkDoorgaan = Button(master=InformatiePersoonlijkFoutFrame, text='Doorgaan', height='3', width='14', background='blue', foreground='white', command=toonInformatiePersoonlijkOutput)
+InformatiePersoonlijkDoorgaan.pack(padx=20, pady=20)
 InformatiePersoonlijkFoutFrame.pack
+
 
 #Informatie Persoonlijk output
 InformatiePersoonlijkOutputFrame = Frame(master=root, background='yellow')
@@ -326,6 +335,7 @@ InformatieLabel.pack(padx=20, pady=20)
 InformatiePersoonlijkOutputLabel = Label(master=InformatiePersoonlijkOutputFrame, text='U kunt nu bij uw fiets!', background='yellow', foreground='blue', width=50, height=5, font=('Helvetica', 25, 'bold'))
 InformatiePersoonlijkOutputLabel.pack(padx=20, pady=20)
 InformatiePersoonlijkOutputFrame.pack
+
 
 #Informatie Persoonlijk invoer
 InformatiePersoonlijkFrame = Frame(master=root, background='yellow')
