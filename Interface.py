@@ -38,7 +38,7 @@ def infoPubliek():
         stallingBezet = []
         for regel in lezer:
             aantalRegels += 1
-            omgezet = terugomzettenASCII(regel['pq^ifkd'])
+            omgezet = terugomzettenASCII(regel['pq^iifkd'])
             stallingBezet.append(omgezet)
         stallingBezet.sort()
         return aantalRegels, stallingBezet
@@ -74,13 +74,13 @@ def ophalenGegevens():
         wachtwoorden = []
         datum = []
         for row in reader:
-            omgezet = terugomzettenASCII(row['pq^ifkd'])
+            omgezet = terugomzettenASCII(row['pq^iifkd'])
             stalling.append(omgezet)
             omgezet = terugomzettenASCII(row['t^`eqtlloa'])
             wachtwoorden.append(omgezet)
             omgezet = terugomzettenASCII(row['a^qrj'])
             datum.append(omgezet)
-            omgezet = terugomzettenASCII(row['uhjlvwudwlhqxpphu'])
+            omgezet = terugomzettenASCII(row['obdfpqo^qfbkrjjbo'])
             registratienummer.append(omgezet)
         return stalling, wachtwoorden, datum, registratienummer
 
@@ -110,7 +110,7 @@ def ophalen(invoerRegistratienummer, invoerWachtwoord):
             combined = [stallingNieuw, wachtwoordenNieuw, datumNieuw, registratienummerNieuw]
             with open('stalling.csv', 'w', newline='') as myCSVFile:
                 writer = csv.writer(myCSVFile, delimiter=',')
-                writer.writerow(['pq^ifkd', 't^`eqtlloa', 'a^qrj', 'uhjlvwudwlhqxpphu'])
+                writer.writerow(['pq^iifkd', 't^`eqtlloa', 'a^qrj', 'obdfpqo^qfbkrjjbo'])
                 for i in zip(*combined):
                     writer.writerow(i)
         else:
@@ -120,6 +120,7 @@ def ophalen(invoerRegistratienummer, invoerWachtwoord):
 
 
 def plekVrij(invoerRegistratienummer, invoerNieuwStallingNummer, wachtwoordStallingsplaats):
+    aantalStallingen, stallingenVrij = infoPubliek()
     with open('registreren.csv', 'r', newline='') as myCSVFile:
         lezer = csv.DictReader(myCSVFile, delimiter=',')
         lijst = []
@@ -129,7 +130,7 @@ def plekVrij(invoerRegistratienummer, invoerNieuwStallingNummer, wachtwoordStall
             omgezet = terugomzettenASCII(regel['obdfpqo^qfbkrjjbo'])
             lijst.append(omgezet)
         if invoerRegistratienummer in lijst:
-                if invoerNieuwStallingNummer in infoPubliek():
+                if str(invoerNieuwStallingNummer) in stallingenVrij:
                     return 'fout'
                 elif len(invoerNieuwStallingNummer) > 2:
                     return 'fout'
@@ -147,23 +148,32 @@ def plekVrij(invoerRegistratienummer, invoerNieuwStallingNummer, wachtwoordStall
             return 'fout'
 
 def stallen():
+    if plekVrij(invoerRegistratienummer.get(), invoerNieuwStallingNummer.get(), invoerStallenWachtwoord.get()) == 'fout':
+        return 'fout'
     with open('stalling.csv', 'a', newline='') as myCSVFile:
         schrijven = csv.writer(myCSVFile)
         schrijven.writerow(plekVrij(invoerRegistratienummer.get(), invoerNieuwStallingNummer.get(), invoerStallenWachtwoord.get()))
 
 def registreren(invoerNaam, invoerANaam, invoerGeboorteDatum, invoerFietsMerk):
-    Nummer = range(10000000, 99999999)
-    RandomGetal = random.choice(Nummer)
-    while True:
-        fileOpen = open("registreren.csv", "r")
-        fileOpen.readlines()
-        if RandomGetal in fileOpen:
-            Nummer = range(10 ** 8)
-            RandomGetal = random.choice(Nummer)
-        else:
-            omgezetteGetal = omzettenASCII(str(RandomGetal))
-            fileOpen.close()
-            break
+    print(invoerNaam, invoerANaam, invoerGeboorteDatum, invoerFietsMerk)
+    if invoerNaam == '' or invoerANaam == '' or invoerGeboorteDatum == '' or invoerFietsMerk == '':
+        return 'fout'
+    else:
+        Nummer = range(10000000, 100000000)
+        RandomGetal = random.choice(Nummer)
+        while True:
+            fileOpen = open("registreren.csv", "r")
+            fileOpen.readlines()
+            if RandomGetal in fileOpen:
+                Nummer = range(10000000, 100000000)
+                RandomGetal = random.choice(Nummer)
+            else:
+                omgezetteGetal = omzettenASCII(str(RandomGetal))
+                fileOpen.close()
+                break
+        return RandomGetal
+
+def registrerenOpschrijven(invoerNaam, invoerANaam, invoerGeboorteDatum, invoerFietsMerk, RandomGetal):
     voornaam = omzettenASCII(invoerNaam)
     achternaam = omzettenASCII(invoerANaam)
     geboortedatum = omzettenASCII(invoerGeboorteDatum)
@@ -175,8 +185,6 @@ def registreren(invoerNaam, invoerANaam, invoerGeboorteDatum, invoerFietsMerk):
         MyCSVfile.write("," + geboortedatum)
         MyCSVfile.write("," + fietsenmerk)
         MyCSVfile.write("," + str(omgezetteGetal) + "\n")
-    return RandomGetal
-
 
 def tijd():
     vandaag = datetime.datetime.today()
@@ -206,6 +214,8 @@ def toonHome():
     InformatieFrame.pack_forget()
     InformatiePersoonlijkFrame.pack_forget()
     InformatiePersoonlijkFoutFrame.pack_forget()
+    RegistrerenFrame.pack_forget()
+    RegistrerenFoutFrame.pack_forget()
     StallenFoutFrame.pack_forget()
     StallenOutputFrame.pack_forget()
     OphalenFoutFrame.pack_forget()
@@ -267,19 +277,29 @@ def toonStallenOutput():
         StallenOutputFrame.pack()
 
 def toonRegistrerenOutput():
+    RegistrerenFoutFrame.pack_forget()
     x = registreren(invoerNaam.get(), invoerANaam.get(), invoerGeboorteDatum.get(), invoerFietsMerk.get())
     RegistrerenFrame.pack_forget()
-    # RegistrerenOutput
-    RegistrerenOutputFrame = Frame(master=root, background='yellow')
-    RegistrerenOutputFrame.pack(fill="both", expand=True)
-    RegistrerenOutputLabel = Label(master=RegistrerenOutputFrame, text='Registreren', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 25, 'bold'))
-    RegistrerenOutputLabel.pack(padx=20, pady=20)
-    RegistrerenOutputLabel1 = Label(master=RegistrerenOutputFrame, text='Uw registratienummer is: \n{}'.format(x),  background='yellow', foreground='blue', width=500, height=100, font=('Helvetica', 25, 'bold'))
-    RegistrerenOutputLabel1.pack(padx=20, pady=20)
+    if x == 'fout':
+        print('fout')
+        RegistrerenFoutFrame.pack()
+        return
+    else:
+        registrerenOpschrijven(invoerNaam.get(), invoerANaam.get(), invoerGeboorteDatum.get(), invoerFietsMerk.get(), x)
+        RegistrerenOutputFrame = Frame(master=root, background='yellow')
+        RegistrerenOutputFrame.pack(fill="both", expand=True)
+        RegistrerenOutputLabel = Label(master=RegistrerenOutputFrame, text='Registreren', background='yellow',
+                                       foreground='blue', width=50, height=1, font=('Helvetica', 25, 'bold'))
+        RegistrerenOutputLabel.pack(padx=20, pady=20)
+        RegistrerenOutputLabel1 = Label(master=RegistrerenOutputFrame, text='Uw registratienummer is: \n' + str(x),
+                                        background='yellow', foreground='blue', width=50, height=3,
+                                        font=('Helvetica', 25, 'bold'))
+        RegistrerenOutputLabel1.pack(padx=20, pady=20)
 
 def toonOphalenOutput():
     OphalenFrame.pack_forget()
-    if ophalen(OphalenRegistratienummer.get(), OphalenWachtwoord.get()) == 'fout':
+    OphalenFoutFrame.pack_forget()
+    if OphalenRegistratienummer.get() == None or OphalenWachtwoord.get() == None:
         OphalenFoutFrame.pack()
     else:
         OphalenOutputFrame.pack()
@@ -290,8 +310,8 @@ root.title = ('home')
 root.configure(background='yellow')
 homeFrame = Frame(master=root, background='yellow')
 homeFrame.pack(fill="both", expand=True)
-vandaag = Label(master=root, text='Vandaag' + '\n' + datum() + '\n' + tijdKlok(), background='yellow', foreground='blue', width=80, height=5, font=('Helvetica', 14, 'bold'))
-vandaag.place(x=970, y=700)
+vandaag = Label(master=root, text='Vandaag' + '\n' + datum() + '\n' + tijdKlok(), background='yellow', foreground='blue', width=20, height=5, font=('Helvetica', 13, 'bold'))
+vandaag.place(x=1350, y=700)
 homeLabel = Label(master=homeFrame, text=tijd() +',\nWelkom bij NS', background='yellow', foreground='blue', width=50, height=5, font=('Helvetica', 25, 'bold'))
 homeLabel.pack(padx=20, pady=20)
 Registreren = Button(master=homeFrame, text='Registreren', height=7, width=30, font=('Helvetica', 15, 'bold'),background='blue',foreground='white', command=toonRegistreren)
@@ -304,30 +324,58 @@ Informatie = Button(master=homeFrame, text='Informatie', height=7, width=30, fon
 Informatie.place(x=775, y=450)
 
 
+#RegistrerenFoutFrame
+RegistrerenFoutFrame = Frame(master=root, background='yellow')
+RegistrerenFoutFrame.pack(fill="both", expand=True)
+RegistrerenLabel = Label(master=RegistrerenFoutFrame, text='Registreren', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 25, 'bold'))
+RegistrerenLabel.pack(padx=20, pady=20)
+RegistrerenLabel = Label(master=RegistrerenFoutFrame, text='Er mogen geen velden leeg blijven.', background='yellow', foreground='red', width=50, height=1, font=('Helvetica', 15, 'bold'))
+RegistrerenLabel.pack(padx=20, pady=20)
+invoerNaamLabel = Label(master=RegistrerenFoutFrame, text='Voer hieronder uw naam in!', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
+invoerNaamLabel.pack(padx=20, pady=10)
+invoerNaam = Entry(master=RegistrerenFoutFrame, background='blue')
+invoerNaam.pack(padx=20, pady=20)
+invoerANaamLabel = Label(master=RegistrerenFoutFrame, text='Voer hieronder uw achternaam in!', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
+invoerANaamLabel.pack(padx=20, pady=10)
+invoerANaam = Entry(master=RegistrerenFoutFrame, background='blue')
+invoerANaam.pack(padx=20, pady=20)
+invoerGeboorteDatumLabel = Label(master=RegistrerenFoutFrame, text='Voer hieronder uw geboortedatum in!\n(dd-mm-jjjj)', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
+invoerGeboorteDatumLabel.pack(padx=20, pady=10)
+invoerGeboorteDatum = Entry(master=RegistrerenFoutFrame, background='blue')
+invoerGeboorteDatum.pack(padx=20, pady=20)
+invoerFietsmerkLabel = Label(master=RegistrerenFoutFrame, text='Voer hieronder het merk van uw fiets in!', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
+invoerFietsmerkLabel.pack(padx=20, pady=10)
+invoerFietsMerk = Entry(master=RegistrerenFoutFrame, background='blue')
+invoerFietsMerk.pack(padx=20, pady=10)
+RegistrerenDoorgaan = Button(master=RegistrerenFoutFrame, text='Doorgaan', height=3, width=14, font=('Helvetica', 10, 'bold'),background='blue',foreground='white', command=toonRegistrerenOutput)
+RegistrerenDoorgaan.pack(padx=20, pady=40)
+invoerFietsmerkLabel.pack()
+
 #Registreren
 RegistrerenFrame = Frame(master=root, background='yellow')
 RegistrerenFrame.pack(fill="both", expand=True)
 RegistrerenLabel = Label(master=RegistrerenFrame, text='Registreren', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 25, 'bold'))
-RegistrerenLabel.pack(padx=20, pady=10)
+RegistrerenLabel.pack(padx=20, pady=20)
 invoerNaamLabel = Label(master=RegistrerenFrame, text='Voer hieronder uw naam in!', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
-invoerNaamLabel.pack(padx=20, pady=5)
+invoerNaamLabel.pack(padx=20, pady=10)
 invoerNaam = Entry(master=RegistrerenFrame, background='blue')
-invoerNaam.pack(padx=20, pady=10)
+invoerNaam.pack(padx=20, pady=20)
 invoerANaamLabel = Label(master=RegistrerenFrame, text='Voer hieronder uw achternaam in!', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
-invoerANaamLabel.pack(padx=20, pady=5)
+invoerANaamLabel.pack(padx=20, pady=10)
 invoerANaam = Entry(master=RegistrerenFrame, background='blue')
-invoerANaam.pack(padx=20, pady=10)
-invoerGeboorteDatumLabel = Label(master=RegistrerenFrame, text='Voer hieronder uw geboortedatum in! (dd-mm-jjjj)', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
-invoerGeboorteDatumLabel.pack(padx=20, pady=5)
+invoerANaam.pack(padx=20, pady=20)
+invoerGeboorteDatumLabel = Label(master=RegistrerenFrame, text='Voer hieronder uw geboortedatum in!\n(dd-mm-jjjj)', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
+invoerGeboorteDatumLabel.pack(padx=20, pady=10)
 invoerGeboorteDatum = Entry(master=RegistrerenFrame, background='blue')
-invoerGeboorteDatum.pack(padx=20, pady=10)
+invoerGeboorteDatum.pack(padx=20, pady=20)
 invoerFietsmerkLabel = Label(master=RegistrerenFrame, text='Voer hieronder het merk van uw fiets in!', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
-invoerFietsmerkLabel.pack(padx=20, pady=5)
+invoerFietsmerkLabel.pack(padx=20, pady=10)
 invoerFietsMerk = Entry(master=RegistrerenFrame, background='blue')
 invoerFietsMerk.pack(padx=20, pady=10)
 RegistrerenDoorgaan = Button(master=RegistrerenFrame, text='Doorgaan', height=3, width=14, font=('Helvetica', 10, 'bold'),background='blue',foreground='white', command=toonRegistrerenOutput)
-RegistrerenDoorgaan.pack(padx=20, pady=50)
+RegistrerenDoorgaan.pack(padx=20, pady=40)
 invoerFietsmerkLabel.pack()
+
 
 #Stallen
 StallenFrame = Frame(master=root, background='yellow')
@@ -350,12 +398,11 @@ RegistratieNummer.pack()
 invoerRegistratienummer = Entry(master=StallenFrame, text='Voer hieronder uw registratienummer in!', background='blue')
 invoerRegistratienummer.pack(padx=20, pady=20)
 StallenDoorgaan = Button(master=StallenFrame, text='Doorgaan', height=3, width=14, font=('Helvetica', 10, 'bold'),background='blue',foreground='white', command=toonStallenOutput)
-StallenDoorgaan.pack(padx=20, pady=20)
+StallenDoorgaan.pack(padx=20, pady=40)
 
 #StallenOutputFrame
 StallenOutputFrame = Frame(master=root, background='yellow')
 StallenOutputFrame.pack(fill="both", expand=True)
-
 StallenOutputLabel = Label(master=StallenOutputFrame, text='Stallen', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 25, 'bold'))
 StallenOutputLabel.pack(padx=20, pady=20)
 StallenOutputLabel1 = Label(master=StallenOutputFrame, text='Uw fiets staat nu gestalt!', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 25, 'bold'))
@@ -363,7 +410,9 @@ StallenOutputLabel1.pack(padx=20, pady=200)
 
 #StallenFoutFrame
 StallenFoutFrame = Frame(master=root, background='yellow')
-StallenLabel = Label(master=StallenFoutFrame, text='Stallingnummer bezet / Registratienummer niet bekend / Wachtwoord voldoet niet aan de eisen', background='yellow', foreground='red', width=100, height=1, font=('Helvetica', 15, 'bold'))
+StallenLabel = Label(master=StallenFoutFrame, text='Stallen', background='yellow', foreground='blue', width=100, height=1, font=('Helvetica', 25, 'bold'))
+StallenLabel.pack(padx=20, pady=20)
+StallenLabel = Label(master=StallenFoutFrame, text='Stallingnummer bezet / Registratienummer niet bekend / Wachtwoord voldoet niet aan de eisen.', background='yellow', foreground='red', width=100, height=1, font=('Helvetica', 15, 'bold'))
 StallenLabel.pack(padx=20, pady=20)
 StallingenVrij, StallingNummers = infoPubliek()
 StallenLabelStallingenBezet = Label(master=StallenFoutFrame, text='Stallingen {} zijn bezet!'.format(StallingNummers), background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
@@ -381,8 +430,8 @@ RegistratieNummer.pack()
 invoerRegistratienummer = Entry(master=StallenFoutFrame, text='Voer hieronder uw registratienummer in!', background='blue')
 invoerRegistratienummer.pack(padx=20, pady=20)
 StallenDoorgaan = Button(master=StallenFoutFrame, text='Doorgaan', height=3, width=14, font=('Helvetica', 10, 'bold'),background='blue',foreground='white', command=toonStallenOutput)
-StallenDoorgaan.pack(side=TOP)
-StallenFoutFrame.pack(fill="both", expand=True)
+StallenDoorgaan.pack(padx=20, pady=40)
+RegistrerenFoutFrame.pack(fill="both", expand=True)
 
 
 #Ophalen
@@ -412,27 +461,30 @@ OphalenOutputLabel.pack(padx=20, pady=20)
 #OphalenFoutFrame
 OphalenFoutFrame = Frame(master=root, background='yellow')
 OphalenFoutFrame.pack(fill="both", expand=True)
-OphalenFoutLabel = Label(master=OphalenFoutFrame, text='Registratienummer niet bekend / wachtwoord verkeerd!', background='yellow', foreground='red', width=50, height=1, font=('Helvetica', 15, 'bold'))
-OphalenFoutLabel.pack(padx=20, pady=20)
-OphalenFoutRegistratienummerLabel = Label(master=OphalenFoutFrame, text='Voer hieronder uw registratienummer in!', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
-OphalenFoutRegistratienummerLabel.pack()
-OphalenFoutRegistratienummer = Entry(master=OphalenFoutFrame, background='blue')
-OphalenFoutRegistratienummer.pack(padx=20, pady=20)
-OphalenFoutWachtwoordLabel = Label(master=OphalenFoutFrame, text='Voer hieronder uw wachtwoord in!', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
-OphalenFoutWachtwoordLabel.pack()
-OphalenFoutWachtwoord = Entry(master=OphalenFoutFrame, background='blue')
-OphalenFoutWachtwoord.pack(padx=20, pady=20)
-OphalenFoutDoorgaan = Button(master=OphalenFoutFrame, text='Doorgaan', height='3', width='14', background='blue', foreground='white', command=toonOphalenOutput)
-OphalenFoutDoorgaan.pack(padx=20, pady=20)
+OphalenLabel = Label(master=OphalenFoutFrame, text='Ophalen', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 25, 'bold'))
+OphalenLabel.pack(padx=20, pady=20)
+OphalenLabel = Label(master=OphalenFoutFrame, text='Er mogen geen velden leeg blijven.', background='yellow', foreground='red', width=50, height=1, font=('Helvetica', 15, 'bold'))
+OphalenLabel.pack(padx=20, pady=20)
+OphalenRegistratienummerLabel = Label(master=OphalenFoutFrame, text='Voer hieronder uw registratienummer in!', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
+OphalenRegistratienummerLabel.pack()
+OphalenRegistratienummer = Entry(master=OphalenFoutFrame, background='blue')
+OphalenRegistratienummer.pack(padx=20, pady=20)
+OphalenWachtwoordLabel = Label(master=OphalenFoutFrame, text='Voer hieronder uw wachtwoord in!', background='yellow', foreground='blue', width=100, height=2, font=('Helvetica', 15, 'bold'))
+OphalenWachtwoordLabel.pack()
+OphalenWachtwoord = Entry(master=OphalenFoutFrame, background='blue')
+OphalenWachtwoord.pack(padx=20, pady=20)
+OphalenDoorgaan = Button(master=OphalenFoutFrame, text='Doorgaan', height='3', width='14', background='blue', foreground='white', command=toonOphalenOutput)
+OphalenDoorgaan.pack(padx=20, pady=20)
+
 
 #Informatie
 InformatieFrame = Frame(master=root, background='yellow')
 InformatieFrame.pack(fill="both", expand=True)
 InformatieLabel = Label(master=InformatieFrame, text='Informatie', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 25, 'bold'))
 InformatieLabel.pack(padx=20, pady=20)
-PubliekeInformatieButton = Button(master=InformatieFrame, text='Publieke Informatie', height=7, width=30, font=('Helvetica', 15, 'bold'),background='royalblue',foreground='white', command=toonInformatiePubliek)
+PubliekeInformatieButton = Button(master=InformatieFrame, text='Publieke Informatie', height=7, width=30, font=('Helvetica', 15, 'bold'),background='blue',foreground='white', command=toonInformatiePubliek)
 PubliekeInformatieButton.pack(side=TOP)
-PersoonlijkeInformatieButton = Button(master=InformatieFrame, text='Persoonlijke Informatie', height=7, width=30, font=('Helvetica', 15, 'bold'),background='royalblue',foreground='white', command=toonInformatiePersoonlijk)
+PersoonlijkeInformatieButton = Button(master=InformatieFrame, text='Persoonlijke Informatie', height=7, width=30, font=('Helvetica', 15, 'bold'),background='blue',foreground='white', command=toonInformatiePersoonlijk)
 PersoonlijkeInformatieButton.pack(side=TOP)
 
 
@@ -442,7 +494,7 @@ InformatiePubliekFrame.pack
 aantalStallingenVrij, stallingenVrij = infoPubliek()
 InformatiePubliekLabel = Label(master=InformatiePubliekFrame, text='Informatie Publiek', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 25, 'bold'))
 InformatiePubliekLabel.pack(padx=20, pady=20)
-InformatiePubliekLabel1 = Label(master=InformatiePubliekFrame, text='Er zijn in totaal {} stallingen vrij, stallingen {} zijn bezet'.format(100 - aantalStallingenVrij, stallingenVrij), background='yellow', foreground='blue', width=100, height=10, font=('Helvetica', 15, 'bold'))
+InformatiePubliekLabel1 = Label(master=InformatiePubliekFrame, text='Er zijn in totaal {} stallingen vrij, stallingen {} zijn bezet!'.format(100 - aantalStallingenVrij, stallingenVrij), background='yellow', foreground='blue', width=100, height=10, font=('Helvetica', 15, 'bold'))
 InformatiePubliekLabel1.pack()
 InformatiePersoonlijk = Frame(master=root, background='yellow')
 InformatiePersoonlijk.pack
@@ -478,11 +530,11 @@ InformatiePersoonlijkOutputFrame.pack
 InformatiePersoonlijkFrame = Frame(master=root, background='yellow')
 InformatieLabel = Label(master=InformatiePersoonlijkFrame, text='Persoonlijke Informatie', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 25, 'bold'))
 InformatieLabel.pack(padx=20, pady=20)
-invoerStallingLabel = Label(master=InformatiePersoonlijkFrame, text='Voer hieronder uw Stalling nummer in:', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 15, 'bold'))
+invoerStallingLabel = Label(master=InformatiePersoonlijkFrame, text='Voer hieronder uw stallingsnummer in:', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 15, 'bold'))
 invoerStallingLabel.pack(padx=10, pady=0)
 invoerStalling = Entry(master=InformatiePersoonlijkFrame, background='blue')
 invoerStalling.pack(padx=20, pady=20)
-invoerWachtwoordLabel = Label(master=InformatiePersoonlijkFrame, text='Voer hieronder uw Wachtwoord van uw stalling in::', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 15, 'bold'))
+invoerWachtwoordLabel = Label(master=InformatiePersoonlijkFrame, text='Voer hieronder uw wachtwoord van uw stalling in:', background='yellow', foreground='blue', width=50, height=1, font=('Helvetica', 15, 'bold'))
 invoerWachtwoordLabel.pack(padx=10, pady=0)
 invoerWachtwoord = Entry(master=InformatiePersoonlijkFrame, background='blue')
 invoerWachtwoord.pack(padx=20, pady=20)

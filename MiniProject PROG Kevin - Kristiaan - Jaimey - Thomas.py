@@ -121,7 +121,7 @@ def plekVrij(invoerRegistratienummer, invoerNieuwStallingNummer, wachtwoordStall
         aantalRegels = 0
         for regel in lezer:
             aantalRegels += 1
-            omgezet = terugomzettenASCII(regel['uhjlvwudwlhqxpphu'])
+            omgezet = terugomzettenASCII(regel['obdfpqo^qfbkrjjbo'])
             lijst.append(omgezet)
         if invoerRegistratienummer in lijst:
                 if invoerNieuwStallingNummer in infoPubliek():
